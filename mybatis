@@ -1,1 +1,2 @@
-
+# 한글자 (char) 비교
+<if test='chckYn != null and "Y".equals(chckYn)'>
