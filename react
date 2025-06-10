@@ -1,0 +1,34 @@
+# form
+  const detailForm = useForm()
+
+  openConfirm('저장 하시겠습니까?', () => {
+    detailForm.handleSubmit(
+      async (detailData) => {
+        saveChckItem(detailData)
+          .then((response) => {
+            if (response.data.result === 'SUCCESS') {
+              openAlert('저장 성공했습니다.', '')
+              const uidParam = {
+                iifhlHistUid: response?.data?.result,
+              }
+              onClose(uidParam)
+            }
+          })
+          .catch((e) => {
+            if (e.response.data.messageCode === 'E-OM-0008') {
+              openAlert('점검 완료된 항목입니다.', () => {
+                onClose()
+              })
+            }
+          })
+      },
+      (errorFields) => {
+        const key = Object.keys(errorFields)[0]
+        openAlert(errorFields[key][Object.keys(errorFields[key])[0]].message, () => {
+          detailForm.clearErrors()
+          detailForm.setFocus(key + '[' + Object.keys(errorFields[key])[0] + ']')
+        })
+        return
+      },
+    )()
+  })
