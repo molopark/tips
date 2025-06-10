@@ -1,0 +1,57 @@
+# server.js
+const jwt = require('jsonwebtoken')
+const express = require('express')
+const cors = require('cors')
+const app = express()
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+
+let activeSession = {}
+
+app.get('/', (req, res) => {
+    res.send('Hello World')
+})
+
+app.post('/login', (req, res) => {
+    console.log('login')
+    const {userId} = req.body
+    const token = jwt.sign({userId}, 'your_secret_key')
+
+    if(activeSession[userId]) {
+        return res.status(403).send('중복 로그인입니다.')
+    }
+
+    activeSession[userId] = token
+    res.json({token})
+})
+
+app.post('/logout', (req, res) => {
+    const token = req.headers['authorization'].split(' ')[1]
+    const decoded = jwt.verify(token, 'your_secret_key')
+
+    delete activeSession[decoded.userId]
+    res.send('로그아웃 성공')
+})
+
+app.listen(3010, () => {
+    console.log('Server started on port 3010')
+})
+
+
+# 호출.js
+const axios = require('axios')
+
+const url = 'http://localhost:3010/login'
+const data = {
+    userId: 'user123'
+}
+
+axios.post(url, data)
+    .then(response => {
+        console.log(response.data)
+    })
+    .catch(error => {
+        console.error('Error:', error)
+    })
+
