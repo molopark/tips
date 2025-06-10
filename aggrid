@@ -1,0 +1,18 @@
+valueFormatter : 화면표시
+  valueFormatter: (p) => {
+    return p.value === 'Y' ? '사용' : '미사용'
+  },
+
+cellRenderer : 화면처리
+  cellRenderer: (_, params) => {
+    return (
+      <span
+        className="underline"
+        onClick={() => {
+           chkPopup(_.data)
+        }}
+      >
+        {_.data.chrgrNo}
+      </span>
+    )
+  },
