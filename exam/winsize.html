@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+ <meta charset="UTF-8">
+ <title>ES6 화면 확대/축소 예제</title>
+ <style>
+ button {
+ margin: 5px;
+ padding: 10px 20px;
+ cursor: pointer;
+ }
+ </style>
+</head>
+<body>
+ <h1>화면 확대/축소 예제 (ES6)</h1>
+ <button id="zoomInBtn">확대</button>
+ <button id="zoomOutBtn">축소</button>
+ <button id="zoomResetBtn">초기화</button>
+ <button id="btn">click</button>
+
+ <script>
+ let zoomLevel = 100;
+
+ const applyZoom = () => {
+ document.body.style.zoom = `${zoomLevel}%`;
+ console.log(`현재 확대율: ${zoomLevel}%`);
+ };
+
+ const zoomIn = (e) => {
+ if (zoomLevel < 200) {
+ zoomLevel += 20;
+ applyZoom();
+ } else {
+ alert('더 이상 확대할 수 없습니다.');
+ }
+ };
+
+ const zoomOut = () => {
+ if (zoomLevel > 70) {
+ zoomLevel -= 10;
+ applyZoom();
+ } else {
+ alert('더 이상 축소할 수 없습니다.');
+ }
+ };
+
+ const zoomReset = () => {
+ zoomLevel = 100;
+ applyZoom();
+ };
+
+ document.getElementById('zoomInBtn').addEventListener('click', (e) => zoomIn(e));
+ document.getElementById('zoomOutBtn').addEventListener('click', zoomOut);
+ document.getElementById('zoomResetBtn').addEventListener('click', zoomReset);
+
+ const btn = document.getElementById('btn');
+ btn.onclick= () => {
+   alert('click');
+ }
+ </script>
+</body>
+</html>
