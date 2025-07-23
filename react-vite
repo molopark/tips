@@ -1,1 +1,26 @@
+# gemini 프롬프트
+웹프론트 개발환경을 구성할거야. 리액트를 이용하고 컴포넌트와 화면은 분리해서 작업하려고 해. jsx 파일로 화면을 만들거고 서버호출은 별도의 js 파일로 만들거야
 
+# 프로젝트 생성 : my-react-app 폴더 생성
+npm create vite@latest my-react-app -- --template react
+
+# 프로젝트 폴더로 이동 및 필수 패키지 설치
+cd my-react-app
+npm install
+
+# 실행
+npm run dev
+
+# 서버 호출 파일 (src/api/apiService.js)
+# 재사용 가능한 컴포넌트 (src/components/Button.jsx)
+# 화면 컴포넌트 (src/pages/HomePage.jsx)
+# 메인 앱 파일 (src/App.jsx)
+# 앱 시작 파일 (src/main.jsx)
+
+# Tailwind CSS 설치 (Install Tailwind CSS)
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+# Tailwind CSS 설정 (Tailwind CSS Setup)
+tailwind.config.js 설정 (Configure tailwind.config.js)
+index.css에 Tailwind 지시어 추가 (Add Tailwind Directives to index.css)
