@@ -73,3 +73,9 @@ Eclipse (STS) 실행 -> 상단 메뉴에서 File > New > Spring Starter Project�
    2. 콘솔 뷰(Console view)에 Spring Boot가 시작되는 로그 표시. 기본적으로 내장된 Tomcat 서버가 8080 포트에서 실행
    API 엔드포인트 테스트 (Test API Endpoint):
    웹 브라우저를 열고 다음 주소로 접속 : http://localhost:8080/api/hello
+
+# Eclipse에서 VS Code로 개발 환경 변경하기 (Switching Development Environment from Eclipse to VS Code)
+VS Code를 열고 왼쪽 사이드바의 '확장 프로그램' 아이콘(네모 4개 모양)을 클릭
+-> 확장 프로그램들을 검색하여 설치
+   Extension Pack for Java , Spring Boot Extension Pack , Lombok
+-> 실행 : mvn spring-boot:run
