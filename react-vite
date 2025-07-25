@@ -78,4 +78,12 @@ Eclipse (STS) 실행 -> 상단 메뉴에서 File > New > Spring Starter Project�
 VS Code를 열고 왼쪽 사이드바의 '확장 프로그램' 아이콘(네모 4개 모양)을 클릭
 -> 확장 프로그램들을 검색하여 설치
    Extension Pack for Java , Spring Boot Extension Pack , Lombok
--> 실행 : mvn spring-boot:run
+-> 실행 : VS Code의 'Spring Boot Dashboard' 뷰(왼쪽 사이드바에 Spring 로고 아이콘이 생길 거예요)에서 프로젝트를 선택하고 실행 버튼을 클릭
+      또는 mvn spring-boot:run
+
+# 로그를 콘솔에 보여주기
+Lombok을 사용한다면 @Slf4j 어노테이션을 클래스 위에 붙이면 자동으로 log라는 이름의 Logger 객체가 생성
+-> 기본레벨 : log.info("'/api/hello' 호출됨. name 파라미터: {}", name);
+-> log.debug나 log.trace 메시지를 보려면 src/main/resources/application.properties 파일에 다음 설정을 추가
+   : logging.level.com.molo.backend.myspringbackend=DEBUG # 여러분의 기본 패키지 이름으로 변경
+-> yml 형태로 변경가능
