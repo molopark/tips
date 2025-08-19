@@ -1,0 +1,21 @@
+// @RequestPart
+const formData = new FormData();
+formData.append('name', name);
+formData.append('userId', userId);
+fetch(`/api/userlist`, {
+	method: 'POST',
+	body: formData
+})
+
+// @RequestBody
+const formData = {
+  username: 'user123',
+  email: 'user123@example.com'
+};
+fetch(url, {
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json',
+	},
+	body: JSON.stringify(formData)
+})
