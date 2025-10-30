@@ -92,23 +92,24 @@ A. 도메인 및 포트 매핑
 | manage.svc.com | 443 (HTTPS) 또는 80 | manage-service |
 
 B. 외부 접근 흐름 예시
+
     1. 사용자 요청:
 
-    * 사용자가 웹 브라우저에 https://www.svc.com을 입력합니다.
+       * 사용자가 웹 브라우저에 https://www.svc.com을 입력합니다.
 
     2. 공개 IP/로드밸런서:
 
-    * 요청은 클러스터 앞단의 로드밸런서(L4/L7) 또는 Ingress Controller의 공개 IP로 전달됩니다. (예: 203.0.113.10:443)
+       * 요청은 클러스터 앞단의 로드밸런서(L4/L7) 또는 Ingress Controller의 공개 IP로 전달됩니다. (예: 203.0.113.10:443)
 
     3. Ingress 라우팅:
 
-    * Ingress Controller는 HTTP 헤더의 Host 필드(www.svc.com)를 확인합니다.
+       * Ingress Controller는 HTTP 헤더의 Host 필드(www.svc.com)를 확인합니다.
 
-    * Ingress 규칙에 따라 해당 요청을 **www-service**의 **클러스터 IP(10.96.1.10:8080)**로 포워딩합니다.
+       * Ingress 규칙에 따라 해당 요청을 **www-service**의 **클러스터 IP(10.96.1.10:8080)**로 포워딩합니다.
 
     4. 최종 응답:
 
-    * www-service는 연결된 파드(www-pod-1, 2, 3) 중 하나에 트래픽을 분산하고, 해당 파드가 요청을 처리 후 응답을 반환합니다.
+       * www-service는 연결된 파드(www-pod-1, 2, 3) 중 하나에 트래픽을 분산하고, 해당 파드가 요청을 처리 후 응답을 반환합니다.
 
 2. 📞 서비스 간 호출 경로 (클러스터 내부 통신)
 두 파드 그룹(www-pod와 manage-pod)이 서로의 기능을 호출해야 할 때, 클러스터 내부에서는 Service 이름과 클러스터 IP를 통해 통신합니다. 절대로 외부 도메인(www.svc.com)을 사용하여 내부 서비스를 호출하지 않습니다.
