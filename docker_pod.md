@@ -6,23 +6,24 @@
 
 🚀 파드 기반 웹 서비스 확장 원리
 1. 배포의 최소 단위: 파드
-컨테이너화된 애플리케이션은 파드라는 단위로 캡슐화되어 배포됩니다.
+    * 컨테이너화된 애플리케이션은 파드라는 단위로 캡슐화되어 배포됩니다.
 
-쿠버네티스는 개별 컨테이너가 아닌 파드 단위로 리소스를 할당하고 스케줄링합니다.
+    * 쿠버네티스는 개별 컨테이너가 아닌 파드 단위로 리소스를 할당하고 스케줄링합니다.
 
 2. 확장의 핵심 리소스: Deployment 또는 ReplicaSet
+
 사용자가 직접 파드를 생성하고 삭제하는 대신, 쿠버네티스에서는 파드의 개수와 상태를 관리하는 컨트롤러를 사용합니다.
 
-ReplicaSet: 사용자가 정의한 수(Replica)만큼 동일한 파드 인스턴스가 항상 실행되도록 보장합니다.
+  * ReplicaSet: 사용자가 정의한 수(Replica)만큼 동일한 파드 인스턴스가 항상 실행되도록 보장합니다.
 
-Deployment (가장 일반적인 방법): ReplicaSet을 관리하며, 서비스의 업데이트와 롤백 기능을 제공합니다. 실제로 웹 서비스를 확장할 때는 Deployment의 파드 개수를 늘립니다.
+  * Deployment (가장 일반적인 방법): ReplicaSet을 관리하며, 서비스의 업데이트와 롤백 기능을 제공합니다. 실제로 웹 서비스를 확장할 때는 Deployment의 파드 개수를 늘립니다.
 
 3. 실제 확장 과정 (스케일 아웃)
 부하가 발생하여 서비스를 확장해야 할 때, 다음과 같은 방법으로 파드 개수를 늘립니다.
 
-수동 확장: kubectl scale deployment [deployment-name] --replicas=5 명령어를 사용해 원하는 파드 개수(레플리카 수)를 직접 지정합니다.
+    1. 수동 확장: kubectl scale deployment [deployment-name] --replicas=5 명령어를 사용해 원하는 파드 개수(레플리카 수)를 직접 지정합니다.
 
-자동 확장 (HPA): Horizontal Pod Autoscaler (HPA) 리소스를 설정합니다. HPA는 CPU 사용량이나 메모리, 또는 사용자 정의 메트릭이 설정된 임계값을 초과하면 자동으로 Deployment의 파드 개수를 늘리거나(Scale Up) 줄여서(Scale Down) 관리합니다.
+    2. 자동 확장 (HPA): Horizontal Pod Autoscaler (HPA) 리소스를 설정합니다. HPA는 CPU 사용량이나 메모리, 또는 사용자 정의 메트릭이 설정된 임계값을 초과하면 자동으로 Deployment의 파드 개수를 늘리거나(Scale Up) 줄여서(Scale Down) 관리합니다.
 
 4. 부하 분산
 파드가 추가되면, 클라이언트로부터의 요청은 Service라는 쿠버네티스 리소스를 통해 새로 추가된 파드들을 포함하여 실행 중인 모든 파드에 고르게 분산되어 처리됩니다.
@@ -33,32 +34,35 @@ Deployment (가장 일반적인 방법): ReplicaSet을 관리하며, 서비스�
 
 핵심은 다음과 같습니다.
 
-파드 간 IP는 독립적: 각 파드는 고유한 클러스터 IP 주소를 할당받습니다.
+1. 파드 간 IP는 독립적: 각 파드는 고유한 클러스터 IP 주소를 할당받습니다.
 
-파드 내 포트는 공유: 같은 파드에 있는 컨테이너들끼리는 localhost와 포트 공간을 공유합니다.
+2. 파드 내 포트는 공유: 같은 파드에 있는 컨테이너들끼리는 localhost와 포트 공간을 공유합니다.
 
-서비스(Service) 포트는 공유 안 함: 외부 트래픽을 받는 것은 파드가 아니라 쿠버네티스 서비스(Service) 리소스입니다. 이 서비스가 파드의 IP와 포트를 매핑하여 트래픽을 분산합니다.
+3. 서비스(Service) 포트는 공유 안 함: 외부 트래픽을 받는 것은 파드가 아니라 쿠버네티스 서비스(Service) 리소스입니다. 이 서비스가 파드의 IP와 포트를 매핑하여 트래픽을 분산합니다.
 
 🌐 파드와 포트의 관계 상세 설명
 1. 파드 내부 (컨테이너 간)
-포트 공유: 하나의 파드 내에 여러 컨테이너가 있다면, 이 컨테이너들은 같은 네트워크 네임스페이스를 공유합니다. 따라서 이들은 동일한 IP 주소를 가지며, 파드 내에서 포트 번호가 충돌해서는 안 됩니다.
+    * 포트 공유: 하나의 파드 내에 여러 컨테이너가 있다면, 이 컨테이너들은 같은 네트워크 네임스페이스를 공유합니다. 따라서 이들은 동일한 IP 주소를 가지며, 파드 내에서 포트 번호가 충돌해서는 안 됩니다.
 
-예시: 한 파드 내의 컨테이너 A가 8080 포트를 사용한다면, 컨테이너 B는 8080 포트를 사용할 수 없습니다.
+    * 예시: 한 파드 내의 컨테이너 A가 8080 포트를 사용한다면, 컨테이너 B는 8080 포트를 사용할 수 없습니다.
 
 2. 파드 외부 (파드 간)
-IP 독립: 스케일 아웃을 통해 파드를 추가하면, 새로 생성된 파드는 기존 파드와 전혀 다른 고유한 클러스터 IP 주소를 할당받습니다.
+    * IP 독립: 스케일 아웃을 통해 파드를 추가하면, 새로 생성된 파드는 기존 파드와 전혀 다른 고유한 클러스터 IP 주소를 할당받습니다.
 
-포트 재사용 가능: IP 주소가 다르기 때문에, 새로 추가된 파드도 내부적으로 웹 서비스 컨테이너가 **동일한 포트 번호(예: 8080)**를 사용하는 것이 허용됩니다. 실제로 모든 복제본 파드는 동일한 컨테이너 이미지를 사용하므로, 모두 8080 포트를 사용하도록 구성됩니다.
+    * 포트 재사용 가능: IP 주소가 다르기 때문에, 새로 추가된 파드도 내부적으로 웹 서비스 컨테이너가 **동일한 포트 번호(예: 8080)**를 사용하는 것이 허용됩니다. 실제로 모든 복제본 파드는 동일한 컨테이너 이미지를 사용하므로, 모두 8080 포트를 사용하도록 구성됩니다.
 
-구분	IP 주소 공유 여부	포트 번호 충돌 여부
-파드 내 컨테이너 간	공유 (동일한 IP)	충돌 발생 (다른 포트 사용)
-파드 간	공유하지 않음 (고유 IP)	충돌 없음 (동일 포트 사용 가능)
+| 구분 | IP 주소 공유 여부 | 포트 번호 충돌 여부 |
+|---|---|---|
+| 파드 내 컨테이너 간 | 공유 (동일한 IP) | 충돌 발생 (다른 포트 사용) |
+| 파드 간 |	공유하지 않음 (고유 IP) | 충돌 없음 (동일 포트 사용 가능) |
+
 3. 클라이언트와의 연결 (Service의 역할)
+
 클라이언트(사용자)는 파드의 IP 주소에 직접 접근하지 않습니다. 대신 Service라는 중간 리소스에 접근합니다.
 
-Service Port: 서비스가 외부 또는 내부에서 노출하는 포트입니다 (예: 80 또는 443).
+* Service Port: 서비스가 외부 또는 내부에서 노출하는 포트입니다 (예: 80 또는 443).
 
-Target Port: 서비스가 실제로 연결할 파드 내부의 포트입니다 (예: 8080).
+* Target Port: 서비스가 실제로 연결할 파드 내부의 포트입니다 (예: 8080).
 
 Service는 들어오는 요청을 받아, 모든 파드(기존 파드와 신규 파드)의 고유 IP와 Target Port(8080) 조합으로 트래픽을 분산하여 로드 밸런싱 역할을 수행합니다.
 
@@ -71,36 +75,40 @@ Service는 들어오는 요청을 받아, 모든 파드(기존 파드와 신규 
 🏗️ 가상 구성 요소 정의
 두 개의 서비스(www-service와 manage-service)를 정의하고, 각각 다른 Deployment와 Pod 그룹에 연결합니다.
 
-구성 요소	역할	클러스터 IP (가상)	파드 Target Port
-www-pod-1, 2, 3	외부 노출 웹 서버 실행	(고유 IP 할당)	8080
-manage-pod-1, 2	내부 관리 웹 서버 실행	(고유 IP 할당)	8088
-www-service	www-pod 그룹에 연결	10.96.1.10	8080
-manage-service	manage-pod 그룹에 연결	10.96.1.20	8088
+| 구성 요소 | 역할 | 클러스터 IP (가상) | 파드 Target Port |
+|---|---|---|---|
+| www-pod-1, 2, 3 | 외부 노출 웹 서버 실행 | (고유 IP 할당) | 8080 |
+| manage-pod-1, 2 | 내부 관리 웹 서버 실행 | (고유 IP 할당) | 8088 |
+| www-service | www-pod 그룹에 연결 | 10.96.1.10 | 8080 |
+| manage-service | manage-pod 그룹에 연결 | 10.96.1.20 | 8088 |
+
 1. 🌐 외부에서 접근하는 경로 (Ingress를 통한 도메인 분리)
 외부에서 www.svc.com과 manage.svc.com 도메인으로 접근할 때는 Ingress 리소스를 사용하여 트래픽을 분기합니다.
 
 A. 도메인 및 포트 매핑
-도메인 (외부 접근)	Ingress Listener Port	서비스 (쿠버네티스)
-www.svc.com	443 (HTTPS) 또는 80	www-service
-manage.svc.com	443 (HTTPS) 또는 80	manage-service
+| 도메인 (외부 접근) | Ingress Listener Port | 서비스 (쿠버네티스) |
+|---|---|---|
+| www.svc.com | 443 (HTTPS) 또는 80 | www-service |
+| manage.svc.com | 443 (HTTPS) 또는 80 | manage-service |
+
 B. 외부 접근 흐름 예시
-사용자 요청:
+    1. 사용자 요청:
 
-사용자가 웹 브라우저에 https://www.svc.com을 입력합니다.
+    * 사용자가 웹 브라우저에 https://www.svc.com을 입력합니다.
 
-공개 IP/로드밸런서:
+    2. 공개 IP/로드밸런서:
 
-요청은 클러스터 앞단의 로드밸런서(L4/L7) 또는 Ingress Controller의 공개 IP로 전달됩니다. (예: 203.0.113.10:443)
+    * 요청은 클러스터 앞단의 로드밸런서(L4/L7) 또는 Ingress Controller의 공개 IP로 전달됩니다. (예: 203.0.113.10:443)
 
-Ingress 라우팅:
+    3. Ingress 라우팅:
 
-Ingress Controller는 HTTP 헤더의 Host 필드(www.svc.com)를 확인합니다.
+    * Ingress Controller는 HTTP 헤더의 Host 필드(www.svc.com)를 확인합니다.
 
-Ingress 규칙에 따라 해당 요청을 **www-service**의 **클러스터 IP(10.96.1.10:8080)**로 포워딩합니다.
+    * Ingress 규칙에 따라 해당 요청을 **www-service**의 **클러스터 IP(10.96.1.10:8080)**로 포워딩합니다.
 
-최종 응답:
+    4. 최종 응답:
 
-www-service는 연결된 파드(www-pod-1, 2, 3) 중 하나에 트래픽을 분산하고, 해당 파드가 요청을 처리 후 응답을 반환합니다.
+    * www-service는 연결된 파드(www-pod-1, 2, 3) 중 하나에 트래픽을 분산하고, 해당 파드가 요청을 처리 후 응답을 반환합니다.
 
 2. 📞 서비스 간 호출 경로 (클러스터 내부 통신)
 두 파드 그룹(www-pod와 manage-pod)이 서로의 기능을 호출해야 할 때, 클러스터 내부에서는 Service 이름과 클러스터 IP를 통해 통신합니다. 절대로 외부 도메인(www.svc.com)을 사용하여 내부 서비스를 호출하지 않습니다.
@@ -108,13 +116,16 @@ www-service는 연결된 파드(www-pod-1, 2, 3) 중 하나에 트래픽을 분�
 A. 호출 시나리오: 외부 웹 서버 → 내부 관리 웹 서버
 www-pod에서 내부 관리 기능을 호출하는 경우입니다.
 
-단계	호출 주체	대상	주소 및 포트 (클러스터 내부)
-1	www-pod 내부 애플리케이션	manage-service	서비스 이름: http://manage-service:8088
-2	manage-service	manage-pod 그룹	클러스터 IP: 10.96.1.20:8088
-B. 호출 원리
-DNS 활용: 쿠버네티스 클러스터 내부에서는 **서비스 이름(manage-service)**이 자동으로 해당 서비스의 **클러스터 IP(10.96.1.20)**로 변환됩니다.
+| 단계 | 호출 주체 | 대상 | 주소 및 포트 (클러스터 내부) |
+|---|---|---|---|
+| 1 | www-pod 내부 애플리케이션 | manage-service | 서비스 이름: http://manage-service:8088 |
+| 2 | manage-service | manage-pod 그룹 | 클러스터 IP: 10.96.1.20:8088 |
 
-Target Port 사용: manage-service:8088로 호출하면, manage-service는 자신의 클러스터 IP로 온 요청을 연결된 모든 manage-pod의 Target Port 8088로 로드 밸런싱합니다.
+B. 호출 원리
+
+    * DNS 활용: 쿠버네티스 클러스터 내부에서는 **서비스 이름(manage-service)**이 자동으로 해당 서비스의 **클러스터 IP(10.96.1.20)**로 변환됩니다.
+
+    * Target Port 사용: manage-service:8088로 호출하면, manage-service는 자신의 클러스터 IP로 온 요청을 연결된 모든 manage-pod의 Target Port 8088로 로드 밸런싱합니다.
 
 이 방식을 사용하면, 파드의 IP가 스케일링 등으로 인해 계속 바뀌더라도, Service IP는 고정되어 있어 안정적인 내부 통신이 가능합니다.
 
@@ -123,17 +134,21 @@ Target Port 사용: manage-service:8088로 호출하면, manage-service는 자�
 이전 답변에 이어, 외부의 별도 웹 서비스(abc.svc1.com)와 클러스터 내부 서비스 간의 통신 시나리오를 추가하여 설명해 드립니다. 핵심은 Service와 Ingress를 통해 트래픽을 분산하고, 외부 서비스 통신에는 NodePort/LoadBalancer Service 또는 Egress를 활용하는 것입니다.
 
 🏗️ 가상 구성 요소 정의 (재확인)
-구성 요소	역할	클러스터 IP (가상)	파드 Target Port
-www-pod	외부 노출 웹 서버	(고유 IP 할당)	8080
-manage-pod	내부 관리 웹 서버	(고유 IP 할당)	8088
-www-service	www-pod 그룹 연결	10.96.1.10	8080
-manage-service	manage-pod 그룹 연결	10.96.1.20	8088
+| 구성 요소 | 역할 | 클러스터 IP (가상) | 파드 Target Port |
+|---|---|---|---|
+| www-pod | 외부 노출 웹 서버 | (고유 IP 할당) | 8080 |
+| manage-pod | 내부 관리 웹 서버 | (고유 IP 할당) | 8088 |
+| www-service | www-pod 그룹 연결 | 10.96.1.10 | 8080 |
+| manage-service | manage-pod 그룹 연결 | 10.96.1.20 | 8088 |
+
 1. 🌐 외부에서 클러스터 서비스로 접근하는 경로 (Ingress)
 외부 사용자가 도메인을 통해 접근하는 경로는 Ingress Controller가 라우팅을 담당합니다.
 
-도메인	Ingress 공개 IP/Port	서비스 라우팅 대상	파드 Port
-www.svc.com	203.0.113.10:443	www-service (10.96.1.10)	8080
-manage.svc.com	203.0.113.10:443	manage-service (10.96.1.20)	8088
+| 도메인 | Ingress 공개 IP/Port | 서비스 라우팅 대상 | 파드 Port |
+|---|---|---|---|
+| www.svc.com | 203.0.113.10:443 | www-service (10.96.1.10) | 8080 |
+| manage.svc.com | 203.0.113.10:443 | manage-service (10.96.1.20) | 8088 |
+
 흐름: 사용자 요청 (https://www.svc.com) → Ingress 공개 IP → Ingress 규칙에 따라 → www-service의 클러스터 IP → www-pod 중 하나로 분산.
 
 2. 📞 내부 서비스 간 호출 경로 (클러스터 내부)
@@ -142,16 +157,16 @@ www-pod와 manage-pod가 서로 통신할 때는 Service 이름(DNS) 또는 클�
 A. 외부 웹 서버 → 내부 관리 웹 서버
 www-pod가 manage-pod의 기능을 호출하는 경우입니다.
 
-호출 주소: http://manage-service:8088
+    * 호출 주소: http://manage-service:8088
 
-실제 경로: www-pod → manage-service (클러스터 IP 10.96.1.20) → manage-pod 중 하나 (10.0.0.x:8088)
+    * 실제 경로: www-pod → manage-service (클러스터 IP 10.96.1.20) → manage-pod 중 하나 (10.0.0.x:8088)
 
 B. 내부 관리 웹 서버 → 외부 웹 서버
 manage-pod가 www-pod의 기능을 호출하는 경우입니다.
 
-호출 주소: http://www-service:8080
+    * 호출 주소: http://www-service:8080
 
-실제 경로: manage-pod → www-service (클러스터 IP 10.96.1.10) → www-pod 중 하나 (10.0.0.y:8080)
+    * 실제 경로: manage-pod → www-service (클러스터 IP 10.96.1.10) → www-pod 중 하나 (10.0.0.y:8080)
 
 3. 📤 외부 별도 웹 서비스와의 호출 경로
 클러스터 내의 서비스(예: www-pod)가 클러스터 외부의 별도 웹 서비스(abc.svc1.com)와 통신하는 두 가지 시나리오가 있습니다.
@@ -159,19 +174,23 @@ manage-pod가 www-pod의 기능을 호출하는 경우입니다.
 A. 클러스터 내부 서비스 → 외부 서비스 (abc.svc1.com)
 www-pod가 외부에 있는 **abc.svc1.com**의 API를 호출하는 경우입니다.
 
-호출 주체	대상 주소 (외부)	클러스터 통과
-www-pod	https://abc.svc1.com:443	Node/Egress
-흐름: www-pod에서 외부 IP 주소로 요청을 보내면, 이 요청은 쿠버네티스 클러스터의 Node를 통해 클러스터 외부로 빠져나갑니다. 이 과정은 Egress 트래픽으로 처리되며, Node의 공인 IP가 발신지 IP가 됩니다.
+| 호출 주체 | 대상 주소 (외부) | 클러스터 통과 |
+|---|---|---|
+| www-pod | https://abc.svc1.com:443 | Node/Egress |
+
+    * 흐름: www-pod에서 외부 IP 주소로 요청을 보내면, 이 요청은 쿠버네티스 클러스터의 Node를 통해 클러스터 외부로 빠져나갑니다. 이 과정은 Egress 트래픽으로 처리되며, Node의 공인 IP가 발신지 IP가 됩니다.
 
 B. 외부 서비스 (abc.svc1.com) → 클러스터 내부 서비스
 abc.svc1.com 서버가 우리 클러스터 내부의 **www-pod**에 접근해야 하는 경우입니다.
 
-호출 주체	대상 주소 (외부)	클러스터 통과
-외부 서버	https://www.svc.com:443	Ingress/LoadBalancer
-흐름: 외부 서버는 일반 사용자와 동일하게 클러스터의 **공개 IP(Ingress)**를 통해 접근해야 합니다.
+| 호출 주체 | 대상 주소 (외부) | 클러스터 통과 |
+|---|---|---|
+| 외부 서버 | https://www.svc.com:443 | Ingress/LoadBalancer |
 
-호출 주소: https://www.svc.com:443 (도메인 사용)
+    * 흐름: 외부 서버는 일반 사용자와 동일하게 클러스터의 **공개 IP(Ingress)**를 통해 접근해야 합니다.
 
-경로: 외부 서버 → Ingress 공개 IP → www-service → www-pod
+    * 호출 주소: https://www.svc.com:443 (도메인 사용)
+
+    * 경로: 외부 서버 → Ingress 공개 IP → www-service → www-pod
 
 이 경우, abc.svc1.com은 자신의 외부 호출과 우리 서비스에 대한 외부 호출을 별도로 수행하며, 통신 경로는 완전히 분리됩니다.
