@@ -1,0 +1,57 @@
+
+# docker 생성
+
+1 docker desktop 설치
+  wsl2 사용 설치 권장
+2 postgressql 설치
+  docker run --name my-postgres -e POSTGRES_PASSWORD=mysecret -p 5432:5432 -d postgres
+  확인 : docker exec -it my-postgres psql -U postgres
+3 redis 설치
+  docker run --name my-redis -p 6379:6379 -d redis
+  확인 : docker exec -it my-redis redis-cli
+4 한번에 관리하기 - docker-compose.yml
+  version: '3.8'
+  services:
+    db:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+    cache:
+    image: redis:latest
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+  * 실행 방법: 파일이 있는 폴더에서 다음 명령어 입력 : docker-compose up -d
+
+
+# docker 사용 - 다른 프로젝트에서 하나의 db를 공유, 데이터베이스(schema)를 나눠서 사용
+
+1 Java Spring Boot (application.yml):
+  spring:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/spring_db # spring_db 스키마 생성 필요
+      username: postgres
+      password: password123
+    data:
+      redis:
+        host: localhost
+        port: 6379
+
+2 Python (Pandas/SQLAlchemy):
+  import pandas as pd
+  from sqlalchemy import create_engine
+
+  # 통계용 데이터 로드
+  engine = create_engine('postgresql://postgres:password123@localhost:5432/stats_db')
+  df = pd.read_sql("SELECT * FROM sales_data", engine)
+
+3 팁 - 초기 테이블 생성
+  docker-compose.yml과 같은 위치에 init.sql을 두면 컨테이너 실행 시 자동으로 테이블 생성
+  volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
