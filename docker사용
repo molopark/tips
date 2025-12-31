@@ -55,3 +55,7 @@
   docker-compose.yml과 같은 위치에 init.sql을 두면 컨테이너 실행 시 자동으로 테이블 생성
   volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+# 명령어
+터미널로 컨테이너 접속 : docker exec -it <컨테이너_이름_또는_ID> bash
+예) docker exec -it python-db-15 bash
