@@ -1,7 +1,0 @@
-컨테이너이름 : my-redis
-
-1 서버실행
-  docker run --name my-redis -p 6379:6379 -d redis:latest
-
-2 클라이언트 실행
-  docker exec -it my-redis redis-cli
