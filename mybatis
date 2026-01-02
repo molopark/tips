@@ -1,2 +1,7 @@
 # 한글자 (char) 비교
 <if test='chckYn != null and "Y".equals(chckYn)'>
+
+# postgreSQL
+show timezone;  --TimeZone
+select version();
+select now();   -- date
